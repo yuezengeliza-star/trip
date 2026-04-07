@@ -4,9 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scenic Explorer</title>
-    <meta http-equiv="refresh" content="0; url=/pages/index.html">
+    <link rel="stylesheet" href="../styles/style.css">
 </head>
 <body>
-    <p>正在重定向到 Scenic Explorer...</p>
+    <header class="header">
+        <h1>魔都探险攻略</h1>
+        <div class="header-actions">
+            <button class="header-btn" id="login-btn" style="display: block;">登录</button>
+            <button class="header-btn primary" id="register-btn" style="display: block;">注册</button>
+            <div class="user-menu" id="user-menu" style="display: none;">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <span class="user-name" id="user-name">用户</span>
+                <button class="logout-btn" id="logout-btn">退出</button>
+            </div>
+            <div class="user-profile" id="user-profile" style="display: none;">
+                <div class="user-avatar">U</div>
+                <span class="user-text">我的</span>
+                <div class="user-dropdown" id="user-dropdown">
+                    <div class="dropdown-section">
+                        <h3>近期看过</h3>
+                        <div class="recently-viewed" id="recently-viewed">
+                            <!-- 动态生成最近看过的景点 -->
+                        </div>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="#" class="dropdown-item" id="my-favorites">我的收藏 (0)</a>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="#" class="dropdown-item" id="account-settings">账户设置</a>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="#" class="dropdown-item" id="dropdown-logout">退出登录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main">
+        <!-- 导航栏 -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" id="all-spots-tab">全部景点</button>
+            <button class="nav-tab" id="itineraries-tab">推荐路线</button>
+            <button class="nav-tab" id="favorites-tab">我的收藏</button>
+            <button class="nav-tab" id="news-tab">魔都动态</button>
+        </div>
+        
+        <!-- 动态资讯位（仅在首页显示） -->
+        <section class="news-ticker" id="home-news-ticker">
+            <div class="news-container" id="news-container">
+                <!-- 动态生成的资讯卡片将在这里显示 -->
+            </div>
+        </section>
+        
+        <section class="search-filter">
+            <div class="controls-wrapper">
+                <div class="left-section">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="搜索景点名称或城市...">
+                        <span class="search-icon">🔍</span>
+                        <button class="reset-button" id="reset-button">重置</button>
+                    </div>
+                    <div class="tags-container" id="tags-container">
+                        <!-- 动态生成的标签按钮将在这里显示 -->
+                    </div>
+                </div>
+                <div class="right-section">
+                    <div class="sort-container">
+                        <div class="custom-select">
+                            <select id="sort-select">
+                                <option value="default">默认排序</option>
+                                <option value="rating-desc">按评分从高到低</option>
+                                <option value="rating-asc">按评分从低到高</option>
+                                <option value="price-asc">按价格从低到高</option>
+                                <option value="price-desc">按价格从高到低</option>
+                            </select>
+                            <div class="select-arrow">▼</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+
+        
+        <section class="spots-container" id="spots-container">
+            <!-- 景点列表容器 -->
+        </section>
+        
+        <section class="itineraries-container" id="itineraries-container" style="display: none;">
+            <!-- 路线列表容器 -->
+        </section>
+        
+        <!-- 魔都动态独立视图 -->
+        <section class="news-view" id="news-view" style="display: none;">
+            <!-- 专题头部 -->
+            <div class="news-view-header">
+                <h2 class="news-view-title">近期热点 · 魔都动态</h2>
+                <p class="news-view-subtitle">实时同步 2026 沪上展览、演出与艺术盛事</p>
+                <div class="news-view-divider"></div>
+            </div>
+            <!-- 资讯流容器 -->
+            <div class="news-list" id="news-list">
+                <!-- 动态生成的资讯列表 -->
+            </div>
+        </section>
+    </main>
+    
+    <script src="../app.js"></script>
+    
+    <!-- 景点详情 Modal -->
+    <div class="modal" id="spot-modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <button class="modal-favorite-button" id="modal-favorite-button">🤍</button>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <img id="modal-image" src="" alt="">
+                </div>
+                <div class="modal-info">
+                    <h2 id="modal-name"></h2>
+                    <div class="modal-details">
+                        <span class="modal-price"></span>
+                        <span class="modal-rating"></span>
+                    </div>
+                    <p class="modal-description" id="modal-description"></p>
+                    <div class="modal-meta">
+                        <p><strong>游玩时长：</strong><span id="modal-duration"></span></p>
+                        <p><strong>开放时间：</strong><span id="modal-open-time"></span></p>
+                    </div>
+                    <div class="modal-tips">
+                        <h3>游玩建议</h3>
+                        <p id="modal-tips">建议提前规划行程，避开高峰期。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 路线详情抽屉 -->
+    <div class="route-drawer" id="route-drawer" style="display: none;">
+        <div class="drawer-overlay"></div>
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h2 id="drawer-title"></h2>
+                <span class="drawer-close-button">&times;</span>
+            </div>
+            <div class="drawer-body">
+                <div class="timeline-container" id="timeline-container">
+                    <!-- 时间轴内容将动态生成 -->
+                </div>
+            </div>
+            <div class="drawer-footer">
+                <div class="drawer-card food-card">
+                    <h3>吃住建议</h3>
+                    <div id="food-recommend"></div>
+                    <div id="stay-recommend"></div>
+                </div>
+                <div class="drawer-card transport-card">
+                    <h3>交通避坑</h3>
+                    <div id="transport-info"></div>
+                </div>
+            </div>
+            <div class="drawer-actions">
+                <button class="book-button" id="book-button">立即预订此行程</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预订弹窗 -->
+    <div class="modal" id="booking-modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-body">
+                <h2>预订行程</h2>
+                <div class="booking-form">
+                    <div class="form-group">
+                        <label for="booking-date">选择日期</label>
+                        <input type="date" id="booking-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-people">游玩人数</label>
+                        <input type="number" id="booking-people" min="1" value="1" required>
+                    </div>
+                    <div class="form-group total-price">
+                        <label>总价</label>
+                        <span id="total-price">¥0</span>
+                    </div>
+                    <div class="form-actions">
+                        <button class="cancel-button">取消</button>
+                        <button class="confirm-button" id="confirm-button">确认支付</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预订成功提示 -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="success-icon">✅</div>
+                <h2>预订成功！</h2>
+                <p>电子票已发送至您的手机</p>
+                <button class="ok-button" id="ok-button">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 活动详情抽屉 -->
+    <div class="event-drawer" id="event-drawer">
+        <div class="drawer-overlay"></div>
+        <div class="drawer-content">
+            <!-- 顶部大幅海报 -->
+            <div class="drawer-header">
+                <img class="event-poster" id="event-drawer-poster" src="" alt="">
+                <!-- 毛玻璃标题区域 -->
+                <div class="header-overlay">
+                    <span class="event-tag" id="event-drawer-tag"></span>
+                    <h2 id="event-drawer-title"></h2>
+                </div>
+                <span class="drawer-close-button">&times;</span>
+            </div>
+            <!-- 抽屉内容区 -->
+            <div class="drawer-body">
+                <div class="event-date">
+                    <span class="event-date-label">活动时间</span>
+                    <span id="event-drawer-date"></span>
+                </div>
+                <div class="event-content">
+                    <div class="event-content-title">活动详情</div>
+                    <p id="event-drawer-content"></p>
+                </div>
+                <!-- 入场须知 -->
+                <div class="event-notice">
+                    <div class="event-notice-title">入场须知</div>
+                    <p id="event-drawer-notice">请提前预约，携带有效证件入场。活动期间请遵守现场秩序，配合工作人员引导。</p>
+                </div>
+                <!-- 关联景点 -->
+                <div class="event-related-spot">
+                    <h3>关联景点</h3>
+                    <div class="related-spot-card" id="related-spot-card">
+                        <img src="" alt="">
+                        <div class="related-spot-info">
+                            <h4></h4>
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 用户登录 Modal -->
+    <div class="modal" id="user-login-modal">
+        <div class="modal-content auth-modal">
+            <span class="close-button">&times;</span>
+            <div class="auth-header">
+                <h2>用户登录</h2>
+                <p>欢迎回到 Scenic Explorer</p>
+            </div>
+            <form class="auth-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-username">用户名</label>
+                    <input type="text" id="login-username" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">密码</label>
+                    <input type="password" id="login-password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="auth-btn">登录</button>
+                <div class="auth-footer">
+                    还没有账号？<a href="#" id="show-register">立即注册</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 用户注册 Modal -->
+    <div class="modal" id="user-register-modal">
+        <div class="modal-content auth-modal">
+            <span class="close-button">&times;</span>
+            <div class="auth-header">
+                <h2>用户注册</h2>
+                <p>创建你的 Scenic Explorer 账号</p>
+            </div>
+            <form class="auth-form" id="register-form">
+                <div class="form-group">
+                    <label for="register-username">用户名</label>
+                    <input type="text" id="register-username" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">邮箱</label>
+                    <input type="email" id="register-email" placeholder="请输入邮箱" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">密码</label>
+                    <input type="password" id="register-password" placeholder="请输入密码" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm">确认密码</label>
+                    <input type="password" id="register-confirm" placeholder="请再次输入密码" required minlength="6">
+                </div>
+                <button type="submit" class="auth-btn">注册</button>
+                <div class="auth-footer">
+                    已有账号？<a href="#" id="show-login">立即登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
