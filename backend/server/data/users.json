@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "$2a$10$VqsO5acSRh5JjO7BHnsvSOUBaUqIl07jG/qGXJaIPj3TKezuDEwrS",
+    "email": "admin@example.com",
+    "role": "admin",
+    "status": "active",
+    "createdAt": "2026-04-05T03:12:38.921Z",
+    "lastLogin": null
+  },
+  {
+    "id": 2,
+    "username": "editor",
+    "password": "$2a$10$sPHFWjxI82OW2W6rDLz4FOZCqAMvt9lsWCoTy2wM9RCYuoVjLkCju",
+    "email": "editor@example.com",
+    "role": "editor",
+    "status": "active",
+    "createdAt": "2026-04-05T03:12:39.035Z",
+    "lastLogin": null
+  },
+  {
+    "id": 3,
+    "username": "analyst",
+    "password": "$2a$10$6ttRwjAMspkHsUwK7GdTg.UNgugR6l8A0EtcOc.4MTX38P5Xy1UgK",
+    "email": "analyst@example.com",
+    "role": "analyst",
+    "status": "active",
+    "createdAt": "2026-04-05T03:12:39.149Z",
+    "lastLogin": null
+  },
+  {
+    "id": 4,
+    "username": "viewer",
+    "password": "$2a$10$zQz.vXWSjCqtY4jVMRpCG.n3zkTi2w7FAbMEKWREuefBlfN87okE2",
+    "email": "viewer@example.com",
+    "role": "viewer",
+    "status": "active",
+    "createdAt": "2026-04-05T03:12:39.261Z",
+    "lastLogin": null
+  },
+  {
+    "id": 5,
+    "username": "zy",
+    "password": "$2a$10$DwWYyhQAVs9G9TMVHEPVROSWEexgUT/XE1tLowxr6Lm4Eg9K2kK1m",
+    "email": "3090339111@qq.com",
+    "role": "viewer",
+    "status": "active",
+    "createdAt": "2026-04-06T03:35:17.351Z",
+    "lastLogin": "2026-04-06T03:35:51.683Z"
+  }
+]

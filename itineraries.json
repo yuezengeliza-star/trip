@@ -1,0 +1,219 @@
+
+{
+  "itineraries": [
+    {
+      "id": "i1",
+      "name": "特种兵·魔都 24 小时封神榜",
+      "title": "特种兵·魔都 24 小时封神榜",
+      "category": "Must-visit",
+      "days": 1,
+      "duration": "1天",
+      "spots": ["s5", "s13", "s9", "s3", "s1"],
+      "spots_ids": ["s5", "s13", "s9", "s3", "s1"],
+      "description": "以 10 号线为轴心，从豫园出发，沿南京路到博物馆，再到上海中心，最后到外滩，覆盖上海‘古、今、中、外’四个面",
+      "time_slots": [
+        {
+          "label": "上午",
+          "content": "09:00 豫园感受古建筑"
+        },
+        {
+          "label": "下午",
+          "content": "11:00 南京路快速扫街及午餐 -> 13:30 上海博物馆补充文化底蕴 -> 16:30 登上上海中心看日落"
+        },
+        {
+          "label": "晚上",
+          "content": "19:30 外滩看万国建筑群灯光"
+        }
+      ],
+      "total_cost": 220,
+      "itinerary_map_hint": "以 10 号线为轴心，从豫园出发，沿南京路到博物馆，再到上海中心，最后到外滩，覆盖上海‘古、今、中、外’四个面",
+      "transport": "全程地铁 10 号线 + 2 号线",
+      "food_recommend": "午餐推荐沈大成排骨年糕",
+      "stay_recommend": "住宿建议人民广场区域",
+      "suitable_seasons": ["spring", "summer", "autumn", "winter"],
+      "intensity": 5,
+      "tags": ["特种兵", "地标", "一日游"],
+      "image": "img/s1_waitan.jpg"
+    },
+    {
+      "id": "i2",
+      "name": "慢调魔都·三日沉浸之旅",
+      "title": "慢调魔都·三日沉浸之旅",
+      "category": "Must-visit",
+      "days": 3,
+      "duration": "3天",
+      "spots": ["s6", "s5", "s1", "s9", "s15", "s2", "s3", "s4", "s25", "s26"],
+      "spots_ids": ["s6", "s5", "s1", "s9", "s15", "s2", "s3", "s4", "s25", "s26"],
+      "description": "第一天：城隍庙、豫园、外滩（市中心区域）；第二天：博物馆、新天地、陆家嘴（从西到东）；第三天：田子坊、武康路（梧桐区）",
+      "time_slots": [
+        {
+          "label": "第1天",
+          "content": "城隍庙 -> 豫园 -> 外滩。重点是下午茶和外滩散步。"
+        },
+        {
+          "label": "第2天",
+          "content": "上海博物馆 -> 新天地 -> 陆家嘴三件套。涵盖上海最高端的商业与高度。"
+        },
+        {
+          "label": "第3天",
+          "content": "田子坊 -> 武康路。体验梧桐区 Citywalk。"
+        }
+      ],
+      "total_cost": 549,
+      "itinerary_map_hint": "第一天：城隍庙、豫园、外滩（市中心区域）；第二天：博物馆、新天地、陆家嘴（从西到东）；第三天：田子坊、武康路（梧桐区）",
+      "transport": "地铁 + 出租车",
+      "food_recommend": "新天地附近的特色餐厅",
+      "stay_recommend": "人民广场或外滩附近",
+      "suitable_seasons": ["spring", "autumn"],
+      "intensity": 3,
+      "tags": ["慢游", "文化", "地标"],
+      "image": "img/s5_yuyuan.jpg"
+    },
+    {
+      "id": "i3",
+      "name": "迪士尼亲子一日游",
+      "title": "迪士尼亲子一日游",
+      "category": "Weekend Relaxation",
+      "days": 1,
+      "duration": "1天",
+      "spots": ["s17"],
+      "spots_ids": ["s17"],
+      "description": "迪士尼乐园一日游",
+      "time_slots": [
+        {
+          "label": "全天",
+          "content": "迪士尼乐园游玩及烟花秀"
+        }
+      ],
+      "total_cost": 399,
+      "itinerary_map_hint": "迪士尼乐园一日游",
+      "transport": "地铁 11 号线迪士尼站",
+      "food_recommend": "迪士尼园内特色餐饮",
+      "stay_recommend": "迪士尼周边酒店",
+      "suitable_seasons": ["spring", "summer", "autumn"],
+      "intensity": 4,
+      "tags": ["亲子", "主题乐园", "烟花"],
+      "image": "img/s17_disneyland.jpg"
+    },
+    {
+      "id": "i4",
+      "name": "科技馆与世纪公园亲子线",
+      "title": "科技馆与世纪公园亲子线",
+      "category": "Weekend Relaxation",
+      "days": 1,
+      "duration": "1天",
+      "spots": ["s10", "s21"],
+      "spots_ids": ["s10", "s21"],
+      "description": "从上海科技馆到世纪公园，适合亲子活动",
+      "time_slots": [
+        {
+          "label": "上午",
+          "content": "上海科技馆科普"
+        },
+        {
+          "label": "下午",
+          "content": "世纪公园休闲活动"
+        }
+      ],
+      "total_cost": 70,
+      "itinerary_map_hint": "从上海科技馆到世纪公园，适合亲子活动",
+      "transport": "地铁 2 号线",
+      "food_recommend": "科技馆附近餐厅",
+      "stay_recommend": "浦东世纪公园附近",
+      "suitable_seasons": ["spring", "summer", "autumn"],
+      "intensity": 2,
+      "tags": ["亲子", "科普", "自然"],
+      "image": "img/s10_science-museum.jpg"
+    },
+    {
+      "id": "i5",
+      "name": "邬达克与摩天大楼·建筑博览线",
+      "title": "邬达克与摩天大楼·建筑博览线",
+      "category": "Architectural Marvels",
+      "days": 1,
+      "duration": "1天",
+      "spots": ["s27", "s24", "s4"],
+      "spots_ids": ["s27", "s24", "s4"],
+      "description": "从1933老场坊出发，到滨江大道，最后到金茂大厦，展示上海从 1930 年代到 2020 年代的建筑变迁",
+      "time_slots": [
+        {
+          "label": "上午",
+          "content": "1933老场坊工业风构图"
+        },
+        {
+          "label": "下午",
+          "content": "滨江大道对望浦西建筑群 -> 金茂大厦88层观景"
+        }
+      ],
+      "total_cost": 120,
+      "itinerary_map_hint": "从1933老场坊出发，到滨江大道，最后到金茂大厦，展示上海从 1930 年代到 2020 年代的建筑变迁",
+      "transport": "地铁 + 出租车",
+      "food_recommend": "老场坊内特色餐厅",
+      "stay_recommend": "陆家嘴附近",
+      "suitable_seasons": ["spring", "summer", "autumn", "winter"],
+      "intensity": 3,
+      "tags": ["建筑", "摄影", "历史"],
+      "image": "img/s27_1933-laochangfang.jpg"
+    },
+    {
+      "id": "i6",
+      "name": "森林氧吧与城市绿肺线",
+      "title": "森林氧吧与城市绿肺线",
+      "category": "Natural Scenery",
+      "days": 1,
+      "duration": "1天",
+      "spots": ["s23", "s21"],
+      "spots_ids": ["s23", "s21"],
+      "description": "从共青森林公园到世纪公园，体验上海的自然绿色空间",
+      "time_slots": [
+        {
+          "label": "上午",
+          "content": "共青森林公园莫奈花园野餐"
+        },
+        {
+          "label": "下午",
+          "content": "世纪公园大草坪放空"
+        }
+      ],
+      "total_cost": 25,
+      "itinerary_map_hint": "从共青森林公园到世纪公园，体验上海的自然绿色空间",
+      "transport": "地铁 + 公交车",
+      "food_recommend": "公园内野餐或周边餐厅",
+      "stay_recommend": "市区酒店",
+      "suitable_seasons": ["spring", "autumn"],
+      "intensity": 2,
+      "tags": ["自然", "野餐", "放松"],
+      "image": "img/s23_gongqing-forest-park.jpg"
+    },
+    {
+      "id": "i7",
+      "name": "烟火气里的上海味道",
+      "title": "烟火气里的上海味道",
+      "category": "Local Soul",
+      "days": 1,
+      "duration": "1天",
+      "spots": ["s8", "s26"],
+      "spots_ids": ["s8", "s26"],
+      "description": "从静安寺出发，到武康路区域，体验上海的市井气息",
+      "time_slots": [
+        {
+          "label": "早上",
+          "content": "8:00 去延吉路或乌鲁木齐路吃一副大饼油条"
+        },
+        {
+          "label": "下午",
+          "content": "静安寺闹中取静 -> 愚园路/武康路区域探访弄堂"
+        }
+      ],
+      "total_cost": 50,
+      "itinerary_map_hint": "从静安寺出发，到武康路区域，体验上海的市井气息",
+      "transport": "地铁 + 步行",
+      "food_recommend": "大饼油条、上海本帮菜",
+      "stay_recommend": "静安寺附近",
+      "suitable_seasons": ["spring", "autumn"],
+      "intensity": 2,
+      "tags": ["市井", "美食", "弄堂"],
+      "image": "img/s26_wukang-road.jpg"
+    }
+  ]
+}

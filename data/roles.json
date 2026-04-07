@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "name": "超级管理员",
+    "key": "admin",
+    "type": "system",
+    "description": "拥有所有权限",
+    "permissions": {
+      "users": {
+        "view": true,
+        "add": true,
+        "edit": true,
+        "delete": true
+      },
+      "roles": {
+        "view": true,
+        "add": true,
+        "edit": true,
+        "delete": true
+      },
+      "spots": {
+        "view": true,
+        "add": true,
+        "edit": true,
+        "delete": true
+      },
+      "news": {
+        "view": true,
+        "add": true,
+        "edit": true,
+        "delete": true
+      },
+      "statistics": {
+        "view": true,
+        "export": true,
+        "allData": true,
+        "users": true,
+        "spots": true,
+        "news": true,
+        "favorites": true,
+        "visits": true,
+        "orders": true
+      },
+      "logs": {
+        "view": true,
+        "export": true
+      }
+    },
+    "createdAt": "2026-04-05T02:34:12.005Z",
+    "updatedAt": "2026-04-05T02:34:12.005Z"
+  },
+  {
+    "id": 2,
+    "name": "内容编辑",
+    "key": "editor",
+    "type": "system",
+    "description": "负责内容管理",
+    "permissions": {
+      "users": {
+        "view": false,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "roles": {
+        "view": false,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "spots": {
+        "view": true,
+        "add": true,
+        "edit": true,
+        "delete": true
+      },
+      "news": {
+        "view": true,
+        "add": true,
+        "edit": true,
+        "delete": true
+      },
+      "statistics": {
+        "view": true,
+        "export": false,
+        "allData": false,
+        "users": false,
+        "spots": true,
+        "news": true,
+        "favorites": true,
+        "visits": false,
+        "orders": false
+      },
+      "logs": {
+        "view": false,
+        "export": false
+      }
+    },
+    "createdAt": "2026-04-05T02:34:12.005Z",
+    "updatedAt": "2026-04-05T02:34:12.005Z"
+  },
+  {
+    "id": 3,
+    "name": "数据分析员",
+    "key": "analyst",
+    "type": "system",
+    "description": "负责数据分析",
+    "permissions": {
+      "users": {
+        "view": false,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "roles": {
+        "view": false,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "spots": {
+        "view": true,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "news": {
+        "view": true,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "statistics": {
+        "view": true,
+        "export": true,
+        "allData": true,
+        "users": true,
+        "spots": true,
+        "news": true,
+        "favorites": true,
+        "visits": true,
+        "orders": true
+      },
+      "logs": {
+        "view": true,
+        "export": false
+      }
+    },
+    "createdAt": "2026-04-05T02:34:12.005Z",
+    "updatedAt": "2026-04-05T02:34:12.005Z"
+  },
+  {
+    "id": 4,
+    "name": "查看者",
+    "key": "viewer",
+    "type": "system",
+    "description": "只能查看数据",
+    "permissions": {
+      "users": {
+        "view": false,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "roles": {
+        "view": false,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "spots": {
+        "view": true,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "news": {
+        "view": true,
+        "add": false,
+        "edit": false,
+        "delete": false
+      },
+      "statistics": {
+        "view": true,
+        "export": false,
+        "allData": false,
+        "users": false,
+        "spots": true,
+        "news": true,
+        "favorites": false,
+        "visits": false,
+        "orders": false
+      },
+      "logs": {
+        "view": false,
+        "export": false
+      }
+    },
+    "createdAt": "2026-04-05T02:34:12.005Z",
+    "updatedAt": "2026-04-05T02:34:12.005Z"
+  }
+]

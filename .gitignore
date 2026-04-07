@@ -1,0 +1,47 @@
+# 依赖包
+node_modules/
+
+# IDE 配置文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.trae/
+
+# 临时与系统文件
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# --- 注意：删除了 TEST_AND_REVIEW.md 和 test.js，因为它们是提交作业的一部分 ---
+
+# 数据文件目录（包含所有敏感数据）
+data/
+backend/data/
+backend/server/data/
+
+# 敏感数据文件（显式列出，确保保护）
+**/users.json
+**/roles.json
+**/logs.json
+**/*.secret
+**/secrets.json
+**/credentials.json
+**/auth.json
+**/tokens.json
+
+# 原始/临时数据文件
+itineraries_raw.json
+fix_data.js
+fix_data_simple.js
+
+# 文档和提示文件 (保留 ignore，保持仓库整洁)
+additional_function.md
+manage_prompt.md
+prompt.md
+
+# --- 关于图片和 JSON ---
+# 建议保留它们不被 ignore，这样别人下载你的代码后直接就能跑
+# 如果图片实在太多（比如超过 200MB），才考虑 ignore 它们
