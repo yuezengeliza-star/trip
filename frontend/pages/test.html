@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上海景点展示系统 - 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pass {
+            color: #27ae60;
+        }
+        .fail {
+            color: #e74c3c;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>上海景点展示系统 - 功能测试</h1>
+    <div class="test-result" id="test-result">
+        <p>点击下方按钮开始测试：</p>
+        <button onclick="runAllTests()">运行测试</button>
+    </div>
+    
+    <script src="test.js"></script>
+    <script>
+        // 重写log函数，在页面上显示测试结果
+        function log(message) {
+            console.log(`[TEST] ${message}`);
+            const resultDiv = document.getElementById('test-result');
+            const p = document.createElement('p');
+            
+            if (message.includes('✅')) {
+                p.className = 'pass';
+            } else if (message.includes('❌')) {
+                p.className = 'fail';
+            }
+            
+            p.textContent = message;
+            resultDiv.appendChild(p);
+        }
+        
+        // 重写runAllTests函数，在页面上显示测试结果
+        window.runAllTests = function() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<h2>测试结果</h2>';
+            
+            // 调用原始的runAllTests函数
+            const originalLog = console.log;
+            console.log = function() {
+                originalLog.apply(console, arguments);
+            };
+            
+            // 创建模拟DOM
+            createMockDOM();
+            
+            // 测试结果存储
+            const testResults = {
+                passed: 0,
+                failed: 0
+            };
+            
+            // 执行测试
+            function runTest(testName, testFunction) {
+                log(`开始测试: ${testName}`);
+                try {
+                    const result = testFunction();
+                    if (result) {
+                        testResults.passed++;
+                    } else {
+                        testResults.failed++;
+                    }
+                } catch (error) {
+                    log(`❌ 测试失败: ${error.message}`);
+                    testResults.failed++;
+                }
+                log(`测试完成: ${testName}\n`);
+            }
+            
+            // 运行测试
+            runTest('搜索功能', testSearchFunctionality);
+            runTest('标签多选', testTagSelection);
+            runTest('排序功能', testSortFunctionality);
+            runTest('收藏功能', testFavoriteFunctionality);
+            runTest('搜索-标签-排序联动', testSearchTagSortCombination);
+            runTest('无结果处理', testNoResultHandling);
+            
+            // 输出测试结果
+            log('====================================');
+            log(`测试完成: 通过 ${testResults.passed} 项, 失败 ${testResults.failed} 项`);
+            log('====================================');
+            
+            // 清理
+            document.body.removeChild(document.getElementById('search-input'));
+            document.body.removeChild(document.getElementById('tags-container'));
+            document.body.removeChild(document.getElementById('spots-container'));
+            document.body.removeChild(document.getElementById('sort-select'));
+            document.body.removeChild(document.getElementById('reset-button'));
+            document.body.removeChild(document.querySelector('.nav-tabs'));
+            document.body.removeChild(document.getElementById('favorites-container'));
+            document.body.removeChild(document.querySelector('.search-filter'));
+        };
+    </script>
+</body>
+</html>

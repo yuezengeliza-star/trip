@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计分析 - Scenic Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin-auth.js"></script>
+    <style>
+        /* 管理端主页面样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .top-nav-left h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .logout-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-button:hover {
+            background: #d32f2f;
+        }
+        
+        /* 内容区域 */
+        .content-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .export-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .export-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 统计卡片网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .stat-icon.users {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .stat-icon.spots {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .stat-icon.news {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+        
+        .stat-icon.favorites {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .stat-icon.visits {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .stat-icon.orders {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-change.positive {
+            color: #2ecc71;
+        }
+        
+        .stat-change.negative {
+            color: #e74c3c;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        /* 数据表格 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #666;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                padding: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .admin-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>管理中心</h2>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <i>📊</i>
+                        仪表盘
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-users.html">
+                        <i>👥</i>
+                        用户管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-roles.html">
+                        <i>🎭</i>
+                        角色管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-spots.html">
+                        <i>📍</i>
+                        景点管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-news.html">
+                        <i>📰</i>
+                        资讯管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-statistics.html" class="active">
+                        <i>📈</i>
+                        统计分析
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-logs.html">
+                        <i>📋</i>
+                        操作日志
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <nav class="top-nav">
+                <div class="top-nav-left">
+                    <h3>统计分析</h3>
+                </div>
+                <div class="top-nav-right">
+                    <div class="user-info">
+                        <div class="user-avatar" id="user-avatar">A</div>
+                        <span id="user-name">管理员</span>
+                    </div>
+                    <button class="logout-button" id="logout-button">退出登录</button>
+                </div>
+            </nav>
+            
+            <!-- 关键指标 -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4 class="section-title">关键指标</h4>
+                    <button class="export-button">导出数据</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">总用户数</span>
+                            <div class="stat-icon users">👥</div>
+                        </div>
+                        <div class="stat-value">128</div>
+                        <div class="stat-change positive">
+                            ↑ 12.5% 较上月
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">景点数量</span>
+                            <div class="stat-icon spots">📍</div>
+                        </div>
+                        <div class="stat-value">28</div>
+                        <div class="stat-change positive">
+                            ↑ 5.2% 较上月
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">资讯数量</span>
+                            <div class="stat-icon news">📰</div>
+                        </div>
+                        <div class="stat-value">18</div>
+                        <div class="stat-change positive">
+                            ↑ 25.0% 较上月
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">收藏数</span>
+                            <div class="stat-icon favorites">❤️</div>
+                        </div>
+                        <div class="stat-value">356</div>
+                        <div class="stat-change positive">
+                            ↑ 8.3% 较上月
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">访问量</span>
+                            <div class="stat-icon visits">👁️</div>
+                        </div>
+                        <div class="stat-value">12,580</div>
+                        <div class="stat-change positive">
+                            ↑ 18.7% 较上月
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">预订数</span>
+                            <div class="stat-icon orders">📋</div>
+                        </div>
+                        <div class="stat-value">234</div>
+                        <div class="stat-change positive">
+                            ↑ 15.2% 较上月
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 图表区域 -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4 class="section-title">数据趋势</h4>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">用户增长趋势</div>
+                    <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666;">
+                        <canvas id="userGrowthChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">景点访问热度</div>
+                    <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666;">
+                        <canvas id="spotHeatChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 热门景点 -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4 class="section-title">热门景点</h4>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>景点名称</th>
+                            <th>访问量</th>
+                            <th>收藏数</th>
+                            <th>评分</th>
+                            <th>趋势</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>外滩</td>
+                            <td>2,850</td>
+                            <td>128</td>
+                            <td>4.9</td>
+                            <td><span class="stat-change positive">↑ 15%</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>东方明珠</td>
+                            <td>2,150</td>
+                            <td>98</td>
+                            <td>4.6</td>
+                            <td><span class="stat-change positive">↑ 8%</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>豫园</td>
+                            <td>1,890</td>
+                            <td>85</td>
+                            <td>4.7</td>
+                            <td><span class="stat-change positive">↑ 12%</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>上海展览中心</td>
+                            <td>1,560</td>
+                            <td>65</td>
+                            <td>4.8</td>
+                            <td><span class="stat-change positive">↑ 20%</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>迪士尼乐园</td>
+                            <td>1,420</td>
+                            <td>72</td>
+                            <td>4.7</td>
+                            <td><span class="stat-change positive">↑ 5%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // 检查登录状态
+        function checkLogin() {
+            const result = checkLoginStatus();
+            if (!result.success) {
+                window.location.href = 'admin.html';
+            }
+        }
+        
+        // 退出登录
+        document.getElementById('logout-button').addEventListener('click', function() {
+            logout();
+            window.location.href = 'admin.html';
+        });
+        
+        // 初始化用户信息
+        function initUserInfo() {
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                document.getElementById('user-name').textContent = currentUser.username;
+                document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+            }
+        }
+        
+        // 检查权限
+        function hasPermission(permission) {
+            return checkPermission(permission);
+        }
+        
+        // 根据权限显示内容
+        function showContentBasedOnPermissions() {
+            const canViewStats = hasPermission('statistics.view');
+            const canExportStats = hasPermission('statistics.export');
+            const canViewAllData = hasPermission('statistics.allData');
+            const canViewUsersData = hasPermission('statistics.users');
+            const canViewSpotsData = hasPermission('statistics.spots');
+            const canViewNewsData = hasPermission('statistics.news');
+            const canViewFavoritesData = hasPermission('statistics.favorites');
+            const canViewVisitsData = hasPermission('statistics.visits');
+            const canViewOrdersData = hasPermission('statistics.orders');
+            
+            if (!canViewStats) {
+                // 如果没有查看统计的权限，显示无权限提示
+                const mainContent = document.querySelector('.main-content');
+                mainContent.innerHTML = `
+                    <div class="content-section">
+                        <div style="text-align: center; padding: 50px 0;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+                            <h3 style="color: #666; margin-bottom: 10px;">权限不足</h3>
+                            <p style="color: #999;">您没有查看统计数据的权限</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 控制导出按钮显示
+            const exportButton = document.querySelector('.export-button');
+            if (exportButton) {
+                exportButton.style.display = canExportStats ? 'block' : 'none';
+                if (canExportStats) {
+                    exportButton.addEventListener('click', exportStatistics);
+                }
+            }
+            
+            // 控制统计卡片显示
+            const statCards = document.querySelectorAll('.stat-card');
+            if (!canViewAllData) {
+                // 对于没有查看所有数据权限的角色，根据具体权限显示卡片
+                const cardPermissions = [
+                    canViewUsersData,  // 总用户数
+                    canViewSpotsData,  // 景点数量
+                    canViewNewsData,   // 资讯数量
+                    canViewFavoritesData, // 收藏数
+                    canViewVisitsData, // 访问量
+                    canViewOrdersData  // 预订数
+                ];
+                
+                statCards.forEach((card, index) => {
+                    card.style.display = cardPermissions[index] ? 'block' : 'none';
+                });
+            }
+            
+            // 控制图表显示
+            const chartContainers = document.querySelectorAll('.chart-container');
+            if (!canViewAllData) {
+                // 对于没有查看所有数据权限的角色，根据权限显示图表
+                chartContainers.forEach((container, index) => {
+                    if (index === 0 && !canViewUsersData) { // 用户增长趋势图表
+                        container.style.display = 'none';
+                    } else if (index === 1 && !canViewSpotsData) { // 景点访问热度图表
+                        container.style.display = 'none';
+                    }
+                });
+            }
+            
+            // 控制热门景点表格显示
+            const hotSpotsSection = document.querySelector('.content-section:nth-child(4)');
+            if (!canViewAllData && !canViewSpotsData && hotSpotsSection) {
+                hotSpotsSection.style.display = 'none';
+            }
+        }
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            initUserInfo();
+            showContentBasedOnPermissions();
+            initCharts();
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            // 检查是否有权限查看用户数据
+            const canViewUsersData = hasPermission('statistics.users');
+            if (canViewUsersData) {
+                // 初始化用户增长趋势图表
+                const userGrowthCtx = document.getElementById('userGrowthChart');
+                if (userGrowthCtx) {
+                    new Chart(userGrowthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                            datasets: [{
+                                label: '用户增长',
+                                data: [10, 30, 50, 80, 100, 128],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // 检查是否有权限查看景点数据
+            const canViewSpotsData = hasPermission('statistics.spots');
+            if (canViewSpotsData) {
+                // 初始化景点访问热度图表
+                const spotHeatCtx = document.getElementById('spotHeatChart');
+                if (spotHeatCtx) {
+                    new Chart(spotHeatCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['外滩', '东方明珠', '豫园', '上海展览中心', '迪士尼乐园'],
+                            datasets: [{
+                                label: '访问量',
+                                data: [2850, 2150, 1890, 1560, 1420],
+                                backgroundColor: [
+                                    'rgba(102, 126, 234, 0.8)',
+                                    'rgba(46, 204, 113, 0.8)',
+                                    'rgba(241, 196, 15, 0.8)',
+                                    'rgba(231, 76, 60, 0.8)',
+                                    'rgba(52, 152, 219, 0.8)'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        
+        // 导出统计数据
+        function exportStatistics() {
+            // 检查导出权限
+            if (!hasPermission('statistics.export')) {
+                alert('您没有导出统计数据的权限！');
+                return;
+            }
+            
+            // 收集统计数据
+            const statisticsData = {
+                timestamp: new Date().toISOString(),
+                user: getCurrentUser()?.username || '未知用户',
+                data: {
+                    users: hasPermission('statistics.users') ? {
+                        total: 128,
+                        growth: '12.5%'
+                    } : null,
+                    spots: hasPermission('statistics.spots') ? {
+                        total: 28,
+                        growth: '5.2%'
+                    } : null,
+                    news: hasPermission('statistics.news') ? {
+                        total: 18,
+                        growth: '25.0%'
+                    } : null,
+                    favorites: hasPermission('statistics.favorites') ? {
+                        total: 356,
+                        growth: '8.3%'
+                    } : null,
+                    visits: hasPermission('statistics.visits') ? {
+                        total: 12580,
+                        growth: '18.7%'
+                    } : null,
+                    orders: hasPermission('statistics.orders') ? {
+                        total: 234,
+                        growth: '15.2%'
+                    } : null
+                }
+            };
+            
+            // 生成CSV内容
+            let csvContent = '数据类型,数值,增长率\n';
+            
+            if (hasPermission('statistics.users')) {
+                csvContent += '用户数,' + statisticsData.data.users.total + ',' + statisticsData.data.users.growth + '\n';
+            }
+            if (hasPermission('statistics.spots')) {
+                csvContent += '景点数,' + statisticsData.data.spots.total + ',' + statisticsData.data.spots.growth + '\n';
+            }
+            if (hasPermission('statistics.news')) {
+                csvContent += '资讯数,' + statisticsData.data.news.total + ',' + statisticsData.data.news.growth + '\n';
+            }
+            if (hasPermission('statistics.favorites')) {
+                csvContent += '收藏数,' + statisticsData.data.favorites.total + ',' + statisticsData.data.favorites.growth + '\n';
+            }
+            if (hasPermission('statistics.visits')) {
+                csvContent += '访问量,' + statisticsData.data.visits.total + ',' + statisticsData.data.visits.growth + '\n';
+            }
+            if (hasPermission('statistics.orders')) {
+                csvContent += '预订数,' + statisticsData.data.orders.total + ',' + statisticsData.data.orders.growth + '\n';
+            }
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = '统计数据_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('统计数据导出成功！');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据可视化 - Scenic Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .top-nav {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .top-nav-left h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .logout-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-button:hover {
+            background: #d32f2f;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>管理中心</h2>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <i>📊</i>
+                        仪表盘
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-users.html">
+                        <i>👥</i>
+                        用户管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-roles.html">
+                        <i>🎭</i>
+                        角色管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-spots.html">
+                        <i>📍</i>
+                        景点管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-news.html">
+                        <i>📰</i>
+                        资讯管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-visualization.html" class="active">
+                        <i>📈</i>
+                        数据可视化
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-logs.html">
+                        <i>📋</i>
+                        操作日志
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        
+        <main class="main-content">
+            <nav class="top-nav">
+                <div class="top-nav-left">
+                    <h3>数据可视化</h3>
+                </div>
+                <div class="top-nav-right">
+                    <div class="user-info">
+                        <div class="user-avatar" id="user-avatar">A</div>
+                        <span id="user-name">管理员</span>
+                    </div>
+                    <button class="logout-button" id="logout-button">退出登录</button>
+                </div>
+            </nav>
+            
+            <div class="stats-summary">
+                <div class="summary-card">
+                    <div class="summary-value" id="summary-users">-</div>
+                    <div class="summary-label">总用户数</div>
+                </div>
+                <div class="summary-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="summary-value" id="summary-spots">-</div>
+                    <div class="summary-label">景点数量</div>
+                </div>
+                <div class="summary-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="summary-value" id="summary-news">-</div>
+                    <div class="summary-label">资讯数量</div>
+                </div>
+                <div class="summary-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="summary-value" id="summary-active">-</div>
+                    <div class="summary-label">活跃用户</div>
+                </div>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4 class="chart-title">用户增长趋势</h4>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4 class="chart-title">景点访问热度</h4>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="spotPopularityChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4 class="chart-title">用户角色分布</h4>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="roleDistributionChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4 class="chart-title">月度活跃用户</h4>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="activeUsersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let charts = {};
+        
+        async function checkLogin() {
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                window.location.href = 'admin.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                if (!result.success) {
+                    localStorage.removeItem('admin_token');
+                    localStorage.removeItem('admin_username');
+                    window.location.href = 'admin.html';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'admin.html';
+            }
+        }
+        
+        document.getElementById('logout-button').addEventListener('click', function() {
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_username');
+            window.location.href = 'admin.html';
+        });
+        
+        function initUserInfo() {
+            const username = localStorage.getItem('admin_username');
+            if (username) {
+                document.getElementById('user-name').textContent = username;
+                document.getElementById('user-avatar').textContent = username.charAt(0).toUpperCase();
+            }
+        }
+        
+        async function loadData() {
+            const token = localStorage.getItem('admin_token');
+            if (!token) return;
+            
+            try {
+                const statsResponse = await fetch(`${API_URL}/statistics`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const statsResult = await statsResponse.json();
+                if (statsResult.success) {
+                    updateSummary(statsResult.data);
+                }
+                
+                const usersResponse = await fetch(`${API_URL}/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const usersResult = await usersResponse.json();
+                if (usersResult.success) {
+                    createCharts(usersResult.data, statsResult.data);
+                }
+                
+                const spotsResponse = await fetch(`${API_URL}/spots`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const spotsResult = await spotsResponse.json();
+                if (spotsResult.success) {
+                    updateSpotChart(spotsResult.data);
+                }
+            } catch (error) {
+                console.error('Load data error:', error);
+            }
+        }
+        
+        function updateSummary(data) {
+            document.getElementById('summary-users').textContent = data.users.total;
+            document.getElementById('summary-spots').textContent = data.spots.total;
+            document.getElementById('summary-news').textContent = data.news.total;
+            document.getElementById('summary-active').textContent = data.users.active;
+        }
+        
+        function createCharts(users, statistics) {
+            createUserGrowthChart(statistics);
+            createRoleDistributionChart(users);
+            createActiveUsersChart();
+        }
+        
+        function createUserGrowthChart(statistics) {
+            const ctx = document.getElementById('userGrowthChart');
+            if (!ctx) return;
+            
+            const months = ['1 月', '2 月', '3 月', '4 月', '5 月', '6 月'];
+            const growthRate = parseFloat(statistics.users.growthRate) || 12.5;
+            
+            const data = {
+                labels: months,
+                datasets: [{
+                    label: '用户增长',
+                    data: [10, 25, 45, 68, 95, statistics.users.total],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            };
+            
+            charts.userGrowth = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createRoleDistributionChart(users) {
+            const ctx = document.getElementById('roleDistributionChart');
+            if (!ctx) return;
+            
+            const roleCount = {};
+            users.forEach(user => {
+                roleCount[user.role] = (roleCount[user.role] || 0) + 1;
+            });
+            
+            const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+            
+            charts.roleDistribution = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(roleCount),
+                    datasets: [{
+                        data: Object.values(roleCount),
+                        backgroundColor: colors.slice(0, Object.keys(roleCount).length)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createActiveUsersChart() {
+            const ctx = document.getElementById('activeUsersChart');
+            if (!ctx) return;
+            
+            const months = ['1 月', '2 月', '3 月', '4 月', '5 月', '6 月'];
+            const activeData = [8, 20, 35, 52, 78, 96];
+            
+            charts.activeUsers = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: '活跃用户',
+                        data: activeData,
+                        backgroundColor: 'rgba(67, 233, 123, 0.8)',
+                        borderColor: '#43e97b',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateSpotChart(spots) {
+            const ctx = document.getElementById('spotPopularityChart');
+            if (!ctx) return;
+            
+            const spotNames = spots.slice(0, 10).map(s => s.name);
+            const spotRatings = spots.slice(0, 10).map(s => s.rating || 4.0);
+            
+            charts.spotPopularity = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: spotNames,
+                    datasets: [{
+                        label: '评分',
+                        data: spotRatings,
+                        backgroundColor: 'rgba(79, 172, 254, 0.8)',
+                        borderColor: '#4facfe',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 5
+                        }
+                    }
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            initUserInfo();
+            loadData();
+        });
+    </script>
+</body>
+</html>

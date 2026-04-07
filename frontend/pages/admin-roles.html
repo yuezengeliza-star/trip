@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色管理 - Scenic Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="admin-auth.js"></script>
+    <style>
+        /* 管理端主页面样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .top-nav-left h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .logout-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-button:hover {
+            background: #d32f2f;
+        }
+        
+        /* 内容区域 */
+        .content-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .add-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .add-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 搜索和筛选 */
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #666;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-button.edit {
+            background: #3498db;
+            color: white;
+        }
+        
+        .action-button.delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .action-button.view {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 权限标签 */
+        .permission-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .permission-tag {
+            padding: 3px 8px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination button:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* 权限选择 */
+        .permissions-section {
+            margin-top: 20px;
+        }
+        
+        .permissions-section h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        
+        .permission-group {
+            margin-bottom: 20px;
+        }
+        
+        .permission-group h5 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .permission-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .permission-item label {
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                padding: 10px;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>管理中心</h2>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <i>📊</i>
+                        仪表盘
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-users.html">
+                        <i>👥</i>
+                        用户管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-roles.html" class="active">
+                        <i>🎭</i>
+                        角色管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-spots.html">
+                        <i>📍</i>
+                        景点管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-news.html">
+                        <i>📰</i>
+                        资讯管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-statistics.html">
+                        <i>📈</i>
+                        统计分析
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-logs.html">
+                        <i>📋</i>
+                        操作日志
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <nav class="top-nav">
+                <div class="top-nav-left">
+                    <h3>角色管理</h3>
+                </div>
+                <div class="top-nav-right">
+                    <div class="user-info">
+                        <div class="user-avatar" id="user-avatar">A</div>
+                        <span id="user-name">管理员</span>
+                    </div>
+                    <button class="logout-button" id="logout-button">退出登录</button>
+                </div>
+            </nav>
+            
+            <!-- 内容区域 -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4 class="section-title">角色列表</h4>
+                    <button class="add-button" id="add-role-button">添加角色</button>
+                </div>
+                
+                <!-- 搜索和筛选 -->
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" placeholder="搜索角色名称...">
+                        <i>🔍</i>
+                    </div>
+                </div>
+                
+                <!-- 角色表格 -->
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>角色名称</th>
+                            <th>描述</th>
+                            <th>权限</th>
+                            <th>用户数量</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>超级管理员</td>
+                            <td>拥有所有权限</td>
+                            <td>
+                                <div class="permission-tags">
+                                    <span class="permission-tag">用户管理</span>
+                                    <span class="permission-tag">角色管理</span>
+                                    <span class="permission-tag">内容管理</span>
+                                    <span class="permission-tag">统计分析</span>
+                                    <span class="permission-tag">日志管理</span>
+                                </div>
+                            </td>
+                            <td>1</td>
+                            <td>2026-01-01</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>内容编辑</td>
+                            <td>负责内容管理</td>
+                            <td>
+                                <div class="permission-tags">
+                                    <span class="permission-tag">内容管理</span>
+                                </div>
+                            </td>
+                            <td>1</td>
+                            <td>2026-01-15</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>数据分析员</td>
+                            <td>负责统计分析</td>
+                            <td>
+                                <div class="permission-tags">
+                                    <span class="permission-tag">统计分析</span>
+                                </div>
+                            </td>
+                            <td>1</td>
+                            <td>2026-02-01</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>查看者</td>
+                            <td>只读权限</td>
+                            <td>
+                                <div class="permission-tags">
+                                    <span class="permission-tag">查看权限</span>
+                                </div>
+                            </td>
+                            <td>1</td>
+                            <td>2026-02-15</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- 分页 -->
+                <div class="pagination">
+                    <button disabled>上一页</button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>下一页</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 添加角色模态框 -->
+    <div class="modal" id="add-role-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加角色</h3>
+                <button class="close-button">&times;</button>
+            </div>
+            <form class="modal-form">
+                <div class="form-group">
+                    <label for="role-name">角色名称</label>
+                    <input type="text" id="role-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="role-key">角色标识</label>
+                    <input type="text" id="role-key" required placeholder="小写字母和下划线">
+                </div>
+                <div class="form-group">
+                    <label for="role-type">角色类型</label>
+                    <select id="role-type" required>
+                        <option value="system">系统角色</option>
+                        <option value="custom">自定义角色</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="role-description">描述</label>
+                    <input type="text" id="role-description" required>
+                </div>
+                
+                <div class="permissions-section">
+                    <h4>权限设置</h4>
+                    
+                    <div class="permission-group">
+                        <h5>用户管理</h5>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-user-view">
+                                <label for="perm-user-view">查看用户</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-user-add">
+                                <label for="perm-user-add">添加用户</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-user-edit">
+                                <label for="perm-user-edit">编辑用户</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-user-delete">
+                                <label for="perm-user-delete">删除用户</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-group">
+                        <h5>角色管理</h5>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-role-view">
+                                <label for="perm-role-view">查看角色</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-role-add">
+                                <label for="perm-role-add">添加角色</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-role-edit">
+                                <label for="perm-role-edit">编辑角色</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-role-delete">
+                                <label for="perm-role-delete">删除角色</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-group">
+                        <h5>景点管理</h5>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-spot-view">
+                                <label for="perm-spot-view">查看景点</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-spot-add">
+                                <label for="perm-spot-add">添加景点</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-spot-edit">
+                                <label for="perm-spot-edit">编辑景点</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-spot-delete">
+                                <label for="perm-spot-delete">删除景点</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-group">
+                        <h5>资讯管理</h5>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-news-view">
+                                <label for="perm-news-view">查看资讯</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-news-add">
+                                <label for="perm-news-add">添加资讯</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-news-edit">
+                                <label for="perm-news-edit">编辑资讯</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-news-delete">
+                                <label for="perm-news-delete">删除资讯</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-group">
+                        <h5>统计分析</h5>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-view">
+                                <label for="perm-stat-view">查看统计</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-export">
+                                <label for="perm-stat-export">导出数据</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-all">
+                                <label for="perm-stat-all">查看所有数据</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-users">
+                                <label for="perm-stat-users">查看用户数据</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-spots">
+                                <label for="perm-stat-spots">查看景点数据</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-news">
+                                <label for="perm-stat-news">查看资讯数据</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-favorites">
+                                <label for="perm-stat-favorites">查看收藏数据</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-visits">
+                                <label for="perm-stat-visits">查看访问量数据</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stat-orders">
+                                <label for="perm-stat-orders">查看预订数据</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-group">
+                        <h5>日志管理</h5>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-log-view">
+                                <label for="perm-log-view">查看日志</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-log-export">
+                                <label for="perm-log-export">导出日志</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 检查登录状态
+        function checkLogin() {
+            const result = checkLoginStatus();
+            if (!result.success) {
+                window.location.href = 'admin.html';
+            }
+        }
+        
+        // 退出登录
+        document.getElementById('logout-button').addEventListener('click', function() {
+            logout();
+            window.location.href = 'admin.html';
+        });
+        
+        // 初始化用户信息
+        function initUserInfo() {
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                document.getElementById('user-name').textContent = currentUser.username;
+                document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+            }
+        }
+        
+        // 加载角色列表
+        function loadRoles() {
+            const roles = getAllRoles();
+            const tbody = document.querySelector('.data-table tbody');
+            tbody.innerHTML = '';
+            
+            roles.forEach(role => {
+                const permissions = [];
+                if (role.permissions.users.view) permissions.push('用户管理');
+                if (role.permissions.roles.view) permissions.push('角色管理');
+                if (role.permissions.spots.view) permissions.push('景点管理');
+                if (role.permissions.news.view) permissions.push('资讯管理');
+                if (role.permissions.statistics.view) permissions.push('统计分析');
+                if (role.permissions.logs.view) permissions.push('日志管理');
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${role.id}</td>
+                    <td>${role.name}</td>
+                    <td>${role.description}</td>
+                    <td>
+                        <div class="permission-tags">
+                            ${permissions.map(p => `<span class="permission-tag">${p}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td>0</td>
+                    <td>${new Date(role.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-button edit" onclick="editRole(${role.id})">编辑</button>
+                            ${role.type !== 'system' ? `<button class="action-button delete" onclick="deleteRoleById(${role.id})">删除</button>` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // 获取权限数据
+        function getPermissions() {
+            return {
+                users: {
+                    view: document.getElementById('perm-user-view').checked,
+                    add: document.getElementById('perm-user-add').checked,
+                    edit: document.getElementById('perm-user-edit').checked,
+                    delete: document.getElementById('perm-user-delete').checked
+                },
+                roles: {
+                    view: document.getElementById('perm-role-view').checked,
+                    add: document.getElementById('perm-role-add').checked,
+                    edit: document.getElementById('perm-role-edit').checked,
+                    delete: document.getElementById('perm-role-delete').checked
+                },
+                spots: {
+                    view: document.getElementById('perm-spot-view').checked,
+                    add: document.getElementById('perm-spot-add').checked,
+                    edit: document.getElementById('perm-spot-edit').checked,
+                    delete: document.getElementById('perm-spot-delete').checked
+                },
+                news: {
+                    view: document.getElementById('perm-news-view').checked,
+                    add: document.getElementById('perm-news-add').checked,
+                    edit: document.getElementById('perm-news-edit').checked,
+                    delete: document.getElementById('perm-news-delete').checked
+                },
+                statistics: {
+                    view: document.getElementById('perm-stat-view').checked,
+                    export: document.getElementById('perm-stat-export').checked,
+                    allData: document.getElementById('perm-stat-all').checked,
+                    users: document.getElementById('perm-stat-users').checked,
+                    spots: document.getElementById('perm-stat-spots').checked,
+                    news: document.getElementById('perm-stat-news').checked,
+                    favorites: document.getElementById('perm-stat-favorites').checked,
+                    visits: document.getElementById('perm-stat-visits').checked,
+                    orders: document.getElementById('perm-stat-orders').checked
+                },
+                logs: {
+                    view: document.getElementById('perm-log-view').checked,
+                    export: document.getElementById('perm-log-export').checked
+                }
+            };
+        }
+        
+        // 设置权限数据
+        function setPermissions(permissions) {
+            document.getElementById('perm-user-view').checked = permissions.users?.view || false;
+            document.getElementById('perm-user-add').checked = permissions.users?.add || false;
+            document.getElementById('perm-user-edit').checked = permissions.users?.edit || false;
+            document.getElementById('perm-user-delete').checked = permissions.users?.delete || false;
+            
+            document.getElementById('perm-role-view').checked = permissions.roles?.view || false;
+            document.getElementById('perm-role-add').checked = permissions.roles?.add || false;
+            document.getElementById('perm-role-edit').checked = permissions.roles?.edit || false;
+            document.getElementById('perm-role-delete').checked = permissions.roles?.delete || false;
+            
+            document.getElementById('perm-spot-view').checked = permissions.spots?.view || false;
+            document.getElementById('perm-spot-add').checked = permissions.spots?.add || false;
+            document.getElementById('perm-spot-edit').checked = permissions.spots?.edit || false;
+            document.getElementById('perm-spot-delete').checked = permissions.spots?.delete || false;
+            
+            document.getElementById('perm-news-view').checked = permissions.news?.view || false;
+            document.getElementById('perm-news-add').checked = permissions.news?.add || false;
+            document.getElementById('perm-news-edit').checked = permissions.news?.edit || false;
+            document.getElementById('perm-news-delete').checked = permissions.news?.delete || false;
+            
+            document.getElementById('perm-stat-view').checked = permissions.statistics?.view || false;
+            document.getElementById('perm-stat-export').checked = permissions.statistics?.export || false;
+            document.getElementById('perm-stat-all').checked = permissions.statistics?.allData || false;
+            document.getElementById('perm-stat-users').checked = permissions.statistics?.users || false;
+            document.getElementById('perm-stat-spots').checked = permissions.statistics?.spots || false;
+            document.getElementById('perm-stat-news').checked = permissions.statistics?.news || false;
+            document.getElementById('perm-stat-favorites').checked = permissions.statistics?.favorites || false;
+            document.getElementById('perm-stat-visits').checked = permissions.statistics?.visits || false;
+            document.getElementById('perm-stat-orders').checked = permissions.statistics?.orders || false;
+            
+            document.getElementById('perm-log-view').checked = permissions.logs?.view || false;
+            document.getElementById('perm-log-export').checked = permissions.logs?.export || false;
+        }
+        
+        // 重置表单
+        function resetForm() {
+            document.getElementById('role-name').value = '';
+            document.getElementById('role-key').value = '';
+            document.getElementById('role-type').value = 'custom';
+            document.getElementById('role-description').value = '';
+            
+            // 重置所有权限
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+        
+        // 编辑角色
+        function editRole(roleId) {
+            const role = getAllRoles().find(r => r.id === roleId);
+            if (role) {
+                document.getElementById('role-name').value = role.name;
+                document.getElementById('role-key').value = role.key;
+                document.getElementById('role-type').value = role.type;
+                document.getElementById('role-description').value = role.description;
+                
+                setPermissions(role.permissions);
+                
+                // 显示模态框
+                addRoleModal.classList.add('show');
+                // 保存角色ID用于更新
+                addRoleModal.dataset.roleId = roleId;
+            }
+        }
+        
+        // 删除角色
+        function deleteRoleById(roleId) {
+            if (confirm('确定要删除这个角色吗？')) {
+                const success = deleteRole(roleId);
+                if (success) {
+                    alert('角色删除成功！');
+                    loadRoles();
+                } else {
+                    alert('角色删除失败，可能是系统角色无法删除！');
+                }
+            }
+        }
+        
+        // 模态框操作
+        const addRoleButton = document.getElementById('add-role-button');
+        const addRoleModal = document.getElementById('add-role-modal');
+        const closeButtons = document.querySelectorAll('.close-button');
+        const modalForm = document.querySelector('.modal-form');
+        
+        addRoleButton.addEventListener('click', function() {
+            resetForm();
+            delete addRoleModal.dataset.roleId;
+            addRoleModal.classList.add('show');
+        });
+        
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                addRoleModal.classList.remove('show');
+            });
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            if (e.target === addRoleModal) {
+                addRoleModal.classList.remove('show');
+            }
+        });
+        
+        // 表单提交
+        modalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const roleData = {
+                name: document.getElementById('role-name').value,
+                key: document.getElementById('role-key').value,
+                type: document.getElementById('role-type').value,
+                description: document.getElementById('role-description').value,
+                permissions: getPermissions()
+            };
+            
+            const roleId = addRoleModal.dataset.roleId;
+            
+            if (roleId) {
+                // 更新角色
+                const updatedRole = updateRole(parseInt(roleId), roleData);
+                if (updatedRole) {
+                    alert('角色更新成功！');
+                } else {
+                    alert('角色更新失败！');
+                }
+            } else {
+                // 添加角色
+                const newRole = addRole(roleData);
+                if (newRole) {
+                    alert('角色添加成功！');
+                } else {
+                    alert('角色添加失败！');
+                }
+            }
+            
+            addRoleModal.classList.remove('show');
+            loadRoles();
+        });
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            initUserInfo();
+            loadRoles();
+        });
+    </script>
+</body>
+</html>

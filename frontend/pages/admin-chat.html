@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>对话管理 - Scenic Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="admin-auth.js"></script>
+    <style>
+        /* 管理端主页面样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .top-nav-left h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .logout-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-button:hover {
+            background: #d32f2f;
+        }
+        
+        /* 内容区域 */
+        .content-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .add-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .add-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 对话容器 */
+        .chat-container {
+            display: flex;
+            height: 600px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        /* 角色列表 */
+        .role-list {
+            width: 250px;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .role-list h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        
+        .role-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .role-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+        
+        .role-item.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .role-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .role-info {
+            flex: 1;
+        }
+        
+        .role-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .role-type {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* 对话区域 */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+        
+        .chat-header h4 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .message.own {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+        
+        .message-content {
+            max-width: 70%;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .message-sender {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-right: 10px;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .message-text {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        
+        .message.own .message-text {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* 消息输入区 */
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            background: white;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-container input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 24px;
+            font-size: 14px;
+        }
+        
+        .input-container input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                padding: 10px;
+            }
+            
+            .role-list {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .chat-container {
+                flex-direction: column;
+                height: 500px;
+            }
+            
+            .role-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+                max-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>管理中心</h2>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <i>📊</i>
+                        仪表盘
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-users.html">
+                        <i>👥</i>
+                        用户管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-roles.html">
+                        <i>🎭</i>
+                        角色管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-spots.html">
+                        <i>📍</i>
+                        景点管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-news.html">
+                        <i>📰</i>
+                        资讯管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-statistics.html">
+                        <i>📈</i>
+                        统计分析
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-logs.html">
+                        <i>📋</i>
+                        操作日志
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-chat.html" class="active">
+                        <i>💬</i>
+                        对话管理
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <nav class="top-nav">
+                <div class="top-nav-left">
+                    <h3>对话管理</h3>
+                </div>
+                <div class="top-nav-right">
+                    <div class="user-info">
+                        <div class="user-avatar" id="user-avatar">A</div>
+                        <span id="user-name">管理员</span>
+                    </div>
+                    <button class="logout-button" id="logout-button">退出登录</button>
+                </div>
+            </nav>
+            
+            <!-- 内容区域 -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4 class="section-title">角色对话</h4>
+                    <button class="add-button" id="add-role-to-chat">添加角色到对话</button>
+                </div>
+                
+                <!-- 对话容器 -->
+                <div class="chat-container">
+                    <!-- 角色列表 -->
+                    <div class="role-list">
+                        <h4>可用角色</h4>
+                        <div class="role-item active" data-role="admin">
+                            <div class="role-avatar">A</div>
+                            <div class="role-info">
+                                <div class="role-name">超级管理员</div>
+                                <div class="role-type">系统角色</div>
+                            </div>
+                        </div>
+                        <div class="role-item" data-role="editor">
+                            <div class="role-avatar">E</div>
+                            <div class="role-info">
+                                <div class="role-name">内容编辑</div>
+                                <div class="role-type">系统角色</div>
+                            </div>
+                        </div>
+                        <div class="role-item" data-role="analyst">
+                            <div class="role-avatar">D</div>
+                            <div class="role-info">
+                                <div class="role-name">数据分析员</div>
+                                <div class="role-type">系统角色</div>
+                            </div>
+                        </div>
+                        <div class="role-item" data-role="viewer">
+                            <div class="role-avatar">V</div>
+                            <div class="role-info">
+                                <div class="role-name">查看者</div>
+                                <div class="role-type">系统角色</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 对话区域 -->
+                    <div class="chat-area">
+                        <div class="chat-header">
+                            <h4>对话 - <span id="current-role">超级管理员</span></h4>
+                        </div>
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="message">
+                                <div class="message-avatar">S</div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-sender">系统</span>
+                                        <span class="message-time">10:00</span>
+                                    </div>
+                                    <div class="message-text">欢迎使用角色对话系统！您可以选择不同的角色进行对话。</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <div class="input-container">
+                                <input type="text" placeholder="输入消息..." id="message-input">
+                                <button class="send-button" id="send-button">发送</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 添加角色到对话模态框 -->
+    <div class="modal" id="add-role-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加角色到对话</h3>
+                <button class="close-button">&times;</button>
+            </div>
+            <form class="modal-form">
+                <div class="form-group">
+                    <label for="select-role">选择角色</label>
+                    <select id="select-role" required>
+                        <option value="">请选择角色</option>
+                        <!-- 角色选项将通过 JavaScript 动态添加 -->
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 检查登录状态
+        function checkLogin() {
+            const result = checkLoginStatus();
+            if (!result.success) {
+                window.location.href = 'admin.html';
+            }
+        }
+        
+        // 退出登录
+        document.getElementById('logout-button').addEventListener('click', function() {
+            logout();
+            window.location.href = 'admin.html';
+        });
+        
+        // 初始化用户信息
+        function initUserInfo() {
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                document.getElementById('user-name').textContent = currentUser.username;
+                document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+            }
+        }
+        
+        // 加载角色列表
+        function loadRoles() {
+            const roles = getAllRoles();
+            const roleList = document.querySelector('.role-list');
+            const selectRole = document.getElementById('select-role');
+            
+            // 清空现有角色
+            roleList.innerHTML = '<h4>可用角色</h4>';
+            selectRole.innerHTML = '<option value="">请选择角色</option>';
+            
+            roles.forEach(role => {
+                // 添加到角色列表
+                const roleItem = document.createElement('div');
+                roleItem.className = 'role-item';
+                roleItem.dataset.role = role.key;
+                roleItem.innerHTML = `
+                    <div class="role-avatar">${role.key.charAt(0).toUpperCase()}</div>
+                    <div class="role-info">
+                        <div class="role-name">${role.name}</div>
+                        <div class="role-type">${role.type === 'system' ? '系统角色' : '自定义角色'}</div>
+                    </div>
+                `;
+                roleList.appendChild(roleItem);
+                
+                // 添加到选择框
+                const option = document.createElement('option');
+                option.value = role.key;
+                option.textContent = role.name;
+                selectRole.appendChild(option);
+            });
+            
+            // 设置默认选中第一个角色
+            const firstRoleItem = roleList.querySelector('.role-item');
+            if (firstRoleItem) {
+                firstRoleItem.classList.add('active');
+                document.getElementById('current-role').textContent = firstRoleItem.querySelector('.role-name').textContent;
+            }
+        }
+        
+        // 切换角色
+        function setupRoleSwitching() {
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.role-item')) {
+                    const roleItem = e.target.closest('.role-item');
+                    
+                    // 移除其他角色的活动状态
+                    document.querySelectorAll('.role-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // 添加当前角色的活动状态
+                    roleItem.classList.add('active');
+                    
+                    // 更新当前角色显示
+                    const roleName = roleItem.querySelector('.role-name').textContent;
+                    document.getElementById('current-role').textContent = roleName;
+                }
+            });
+        }
+        
+        // 发送消息
+        function setupMessageSending() {
+            const sendButton = document.getElementById('send-button');
+            const messageInput = document.getElementById('message-input');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    const currentRole = document.getElementById('current-role').textContent;
+                    const roleKey = document.querySelector('.role-item.active').dataset.role;
+                    
+                    // 创建消息元素
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message own';
+                    messageElement.innerHTML = `
+                        <div class="message-avatar">${roleKey.charAt(0).toUpperCase()}</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender">${currentRole}</span>
+                                <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                            </div>
+                            <div class="message-text">${message}</div>
+                        </div>
+                    `;
+                    
+                    chatMessages.appendChild(messageElement);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // 清空输入框
+                    messageInput.value = '';
+                    
+                    // 模拟系统回复
+                    setTimeout(() => {
+                        const systemMessage = document.createElement('div');
+                        systemMessage.className = 'message';
+                        systemMessage.innerHTML = `
+                            <div class="message-avatar">S</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">系统</span>
+                                    <span class="message-time">${new Date().toLocaleTimeString()}</span>
+                                </div>
+                                <div class="message-text">收到来自 ${currentRole} 的消息: ${message}</div>
+                            </div>
+                        `;
+                        chatMessages.appendChild(systemMessage);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 1000);
+                }
+            }
+            
+            sendButton.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+        
+        // 模态框操作
+        function setupModal() {
+            const addRoleButton = document.getElementById('add-role-to-chat');
+            const addRoleModal = document.getElementById('add-role-modal');
+            const closeButtons = document.querySelectorAll('.close-button');
+            const modalForm = document.querySelector('.modal-form');
+            
+            addRoleButton.addEventListener('click', function() {
+                addRoleModal.classList.add('show');
+            });
+            
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    addRoleModal.classList.remove('show');
+                });
+            });
+            
+            // 点击模态框外部关闭
+            window.addEventListener('click', function(e) {
+                if (e.target === addRoleModal) {
+                    addRoleModal.classList.remove('show');
+                }
+            });
+            
+            // 表单提交
+            modalForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const selectedRole = document.getElementById('select-role').value;
+                if (selectedRole) {
+                    // 这里可以实现添加角色到对话的逻辑
+                    alert('角色添加到对话成功！');
+                    addRoleModal.classList.remove('show');
+                }
+            });
+        }
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            initUserInfo();
+            loadRoles();
+            setupRoleSwitching();
+            setupMessageSending();
+            setupModal();
+        });
+    </script>
+</body>
+</html>

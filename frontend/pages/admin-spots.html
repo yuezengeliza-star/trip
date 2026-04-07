@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景点管理 - Scenic Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="admin-auth.js"></script>
+    <style>
+        /* 管理端主页面样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .top-nav-left h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .logout-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-button:hover {
+            background: #d32f2f;
+        }
+        
+        /* 内容区域 */
+        .content-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .add-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .add-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 搜索和筛选 */
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #666;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* 景点图片 */
+        .spot-image {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        /* 价格标签 */
+        .price-tag {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .price-free {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .price-paid {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .action-button.edit {
+            background: #3498db;
+            color: white;
+        }
+        
+        .action-button.delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .action-button.view {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination button:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                padding: 10px;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>管理中心</h2>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <i>📊</i>
+                        仪表盘
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-users.html">
+                        <i>👥</i>
+                        用户管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-roles.html">
+                        <i>🎭</i>
+                        角色管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-spots.html" class="active">
+                        <i>📍</i>
+                        景点管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-news.html">
+                        <i>📰</i>
+                        资讯管理
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-statistics.html">
+                        <i>📈</i>
+                        统计分析
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-logs.html">
+                        <i>📋</i>
+                        操作日志
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <nav class="top-nav">
+                <div class="top-nav-left">
+                    <h3>景点管理</h3>
+                </div>
+                <div class="top-nav-right">
+                    <div class="user-info">
+                        <div class="user-avatar" id="user-avatar">A</div>
+                        <span id="user-name">管理员</span>
+                    </div>
+                    <button class="logout-button" id="logout-button">退出登录</button>
+                </div>
+            </nav>
+            
+            <!-- 内容区域 -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h4 class="section-title">景点列表</h4>
+                    <button class="add-button" id="add-spot-button">添加景点</button>
+                </div>
+                
+                <!-- 搜索和筛选 -->
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" placeholder="搜索景点名称...">
+                        <i>🔍</i>
+                    </div>
+                    <select class="filter-select">
+                        <option value="all">全部城市</option>
+                        <option value="shanghai">上海</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="all">全部类型</option>
+                        <option value="scenic">景点</option>
+                        <option value="museum">博物馆</option>
+                        <option value="shopping">购物</option>
+                        <option value="entertainment">娱乐</option>
+                        <option value="park">公园</option>
+                        <option value="historical">历史建筑</option>
+                    </select>
+                </div>
+                
+                <!-- 景点表格 -->
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>图片</th>
+                            <th>名称</th>
+                            <th>城市</th>
+                            <th>类型</th>
+                            <th>价格</th>
+                            <th>评分</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><img src="img/s1_shanghai-exhibition-center.jpg" alt="上海展览中心" class="spot-image"></td>
+                            <td>上海展览中心</td>
+                            <td>上海</td>
+                            <td>历史建筑</td>
+                            <td><span class="price-tag price-paid">¥100</span></td>
+                            <td>4.8</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                    <button class="action-button view">查看</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><img src="img/s2_bund.jpg" alt="外滩" class="spot-image"></td>
+                            <td>外滩</td>
+                            <td>上海</td>
+                            <td>景点</td>
+                            <td><span class="price-tag price-free">免费</span></td>
+                            <td>4.9</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                    <button class="action-button view">查看</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><img src="img/s3_yu-garden.jpg" alt="豫园" class="spot-image"></td>
+                            <td>豫园</td>
+                            <td>上海</td>
+                            <td>景点</td>
+                            <td><span class="price-tag price-paid">¥40</span></td>
+                            <td>4.7</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                    <button class="action-button view">查看</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><img src="img/s4_oriental-pearl.jpg" alt="东方明珠" class="spot-image"></td>
+                            <td>东方明珠</td>
+                            <td>上海</td>
+                            <td>景点</td>
+                            <td><span class="price-tag price-paid">¥160</span></td>
+                            <td>4.6</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-button edit">编辑</button>
+                                    <button class="action-button delete">删除</button>
+                                    <button class="action-button view">查看</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- 分页 -->
+                <div class="pagination">
+                    <button disabled>上一页</button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>下一页</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 添加景点模态框 -->
+    <div class="modal" id="add-spot-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加景点</h3>
+                <button class="close-button">&times;</button>
+            </div>
+            <form class="modal-form">
+                <div class="form-group">
+                    <label for="spot-name">景点名称</label>
+                    <input type="text" id="spot-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="spot-city">城市</label>
+                    <select id="spot-city" required>
+                        <option value="shanghai">上海</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="spot-type">类型</label>
+                    <select id="spot-type" required>
+                        <option value="scenic">景点</option>
+                        <option value="museum">博物馆</option>
+                        <option value="shopping">购物</option>
+                        <option value="entertainment">娱乐</option>
+                        <option value="park">公园</option>
+                        <option value="historical">历史建筑</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="spot-price">价格</label>
+                    <input type="number" id="spot-price" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="spot-rating">评分</label>
+                    <input type="number" id="spot-rating" min="0" max="5" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="spot-description">描述</label>
+                    <textarea id="spot-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="spot-image">图片 URL</label>
+                    <input type="url" id="spot-image" required>
+                </div>
+                <div class="form-group">
+                    <label for="spot-open-time">开放时间</label>
+                    <input type="text" id="spot-open-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="spot-visit-minutes">游玩时长（分钟）</label>
+                    <input type="number" id="spot-visit-minutes" min="1" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 检查登录状态
+        function checkLogin() {
+            const result = checkLoginStatus();
+            if (!result.success) {
+                window.location.href = 'admin.html';
+            }
+        }
+        
+        // 退出登录
+        document.getElementById('logout-button').addEventListener('click', function() {
+            logout();
+            window.location.href = 'admin.html';
+        });
+        
+        // 初始化用户信息
+        function initUserInfo() {
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                document.getElementById('user-name').textContent = currentUser.username;
+                document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+            }
+        }
+        
+        // 检查权限
+        function hasPermission(permission) {
+            return checkPermission(permission);
+        }
+        
+        // 模态框操作
+        const addSpotButton = document.getElementById('add-spot-button');
+        const addSpotModal = document.getElementById('add-spot-modal');
+        const closeButtons = document.querySelectorAll('.close-button');
+        
+        addSpotButton.addEventListener('click', function() {
+            addSpotModal.classList.add('show');
+        });
+        
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                addSpotModal.classList.remove('show');
+            });
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            if (e.target === addSpotModal) {
+                addSpotModal.classList.remove('show');
+            }
+        });
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            initUserInfo();
+        });
+    </script>
+</body>
+</html>
